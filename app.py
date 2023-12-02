@@ -6,13 +6,30 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
 app.config['SECRET_KEY']='Sexogay'
 db=SQLAlchemy(app)
 
+class User(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(40))
+    password=db.Column(db.String(30))
+
 class Gastos(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(60))
     price=db.Column(db.Float)
 
+
 with app.app_context():
     db.create_all()
+
+@app.route('/registration', methods=['GET', 'POST'])
+def registration():
+    if request.method == 'POST':
+        name=request.form['name']
+        password=request.form['password']
+        new_user=User(name=name, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+    return render_template('registration.html')
+
 
 @app.route('/vista_gastos', methods=['GET','POST'])
 def vista_gastos():
