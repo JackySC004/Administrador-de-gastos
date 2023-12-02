@@ -28,7 +28,18 @@ def registration():
         new_user=User(name=name, password=password)
         db.session.add(new_user)
         db.session.commit()
+        return render_template('login.html')
     return render_template('registration.html')
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        name=request.form['name']
+        password=request.form['password']
+        user=User.query.filter_by(name=name).first
+        if user and password == user.password:
+            return render_template('/vista_gastos.html')
+    return render_template('login.html')
 
 
 @app.route('/vista_gastos', methods=['GET','POST'])
