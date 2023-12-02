@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 app=Flask(__name__)
@@ -28,7 +28,7 @@ def registration():
         new_user=User(name=name, password=password)
         db.session.add(new_user)
         db.session.commit()
-        return render_template('login.html')
+        return redirect('/login')
     return render_template('registration.html')
 
 @app.route('/login', methods=['GET','POST'])
@@ -36,9 +36,9 @@ def login():
     if request.method == 'POST':
         name=request.form['name']
         password=request.form['password']
-        user=User.query.filter_by(name=name).first
+        user=User.query.filter_by(name=name).first()
         if user and password == user.password:
-            return render_template('/vista_gastos.html')
+            return redirect('/vista_gastos')
     return render_template('login.html')
 
 
