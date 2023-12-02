@@ -1,0 +1,39 @@
+from flask import Flask, render_template, request
+from flask_sqlalchemy import SQLAlchemy
+
+app=Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
+app.config['SECRET_KEY']='Sexogay'
+db=SQLAlchemy(app)
+
+class Gastos(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(60))
+    price=db.Column(db.Float)
+
+with app.app_context():
+    db.create_all()
+
+@app.route('/vista_gastos', methods=['GET','POST'])
+def vista_gastos():
+    if request.method == 'POST':
+        name=request.form['name']
+        price=request.form['price']
+        new_purchase=Gastos(name=name, price=price)
+        print(f" Compra: {new_purchase.name} - Precio: {new_purchase.price}")
+        db.session.add(new_purchase)
+        db.session.commit()
+    return render_template('vista_gastos.html')
+
+@app.route('/total_gastos', methods=['GET', 'POST'])
+def total_gastos():
+    total_gastos=Gastos.query.all()
+    suma=sum([compra.price for compra in total_gastos])
+    
+
+    return render_template ('total_gastos.html', total_gastos=total_gastos,suma=suma)
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
